@@ -1,11 +1,14 @@
 const asyncHander = require('express-async-handler')
 
+const goalsModel = require('../models/GoalsModels')
+
 
 
 
 // ==================Get API======================
 const getAllGoals = asyncHander( async(req,res)=>{
-    res.status(200).json({message:'get all goals api'})
+    const AllGoals = await goalsModel.find({})
+    res.status(200).json({message:'success', data:AllGoals})
 })
 
 
@@ -19,8 +22,8 @@ const createGoal = asyncHander( async(req,res)=>{
         throw new Error ('Please Add Text Field')
      }
      else{
-        res.status(200).json({message:'Creat goals api', data:req.body})
-
+       const goal = await goalsModel.create(req.body)
+       res.status(200).json({message:'success', data:goal})
      }
 })
 
@@ -30,7 +33,15 @@ const createGoal = asyncHander( async(req,res)=>{
 // ==================Update API======================
 
 const updateGoal = asyncHander( async(req,res)=>{
-    res.status(200).json({message:`Update goals api for id: ${req.params.id}`})
+    const newData = req.body
+    const updatedGoal = await goalsModel.findByIdAndUpdate(req.params.id ,newData, {new:true, overwrite:true})
+    if(!updatedGoal){
+        res.status(404)
+        throw new Error("Goal Not Found")
+    }else{
+        res.status(200).json({message:`success`, data: updatedGoal})
+
+    }
 })
 
 
@@ -42,7 +53,13 @@ const updateGoal = asyncHander( async(req,res)=>{
 // ==================Delete Single API======================
 
 const deleteSingleGoal = asyncHander( async(req,res)=>{
-    res.status(200).json({message:`delete single goals api of id: ${req.params.id}`})
+    const deletedGoal = await goalsModel.findByIdAndDelete(req.params.id)
+    if(!deletedGoal){
+        res.status(404)
+        throw new Error("Goal Not Found")
+    }else{
+        res.status(200).json({message:`success`, data: deletedGoal})
+    }
 })
 
 
@@ -55,7 +72,11 @@ const deleteSingleGoal = asyncHander( async(req,res)=>{
 // ==================Delete All API======================
 
 const deleteAllGoals =asyncHander( async(req,res)=>{
-    res.status(200).json({message:'Delete all goals api'})
+
+    const deletedGoal = await goalsModel.deleteMany({})
+
+    res.status(200).json({message:`success`})
+
 })
 
 
